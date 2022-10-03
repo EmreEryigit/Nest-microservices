@@ -7,8 +7,9 @@ COPY package*.json ./
 RUN npm install
 
 COPY libs ./libs
+COPY apps/users ./apps/users
+
 COPY tsconfig.json .
 COPY nest-cli.json .
-COPY apps/users ./apps/users
 
 CMD ["npm", "run", "start:dev", "users"]

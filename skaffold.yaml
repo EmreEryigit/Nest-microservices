@@ -14,7 +14,9 @@ build:
         dockerfile: apps/users/Dockerfile
       sync:
         manual:
-          - src: apps/users/src/**/*.ts
+          - src: "apps/users/src/**/*.ts"
+            dest: .
+          - src: "libs/common/src/**/*.ts"
             dest: .
     - image: emreeryigit/products
       context: nest-kafka
@@ -22,7 +24,9 @@ build:
         dockerfile: apps/products/Dockerfile
       sync:
         manual:
-          - src: apps/products/src/**/*.ts
+          - src: "apps/products/src/**/*.ts"
+            dest: .
+          - src: "libs/common/src/**/*.ts"
             dest: .
     - image: emreeryigit/orders
       context: nest-kafka
@@ -30,5 +34,7 @@ build:
         dockerfile: apps/orders/Dockerfile
       sync:
         manual:
-          - src: apps/orders/src/**/*.ts
+          - src: "apps/orders/src/**/*.ts"
+            dest: .
+          - src: "libs/common/src/**/*.ts"
             dest: .

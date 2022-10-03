@@ -1,12 +1,16 @@
-import { Controller, Get } from '@nestjs/common';
-import { OrdersService } from './orders.service';
+import { Controller, Get, OnModuleDestroy } from "@nestjs/common";
+import { OrdersService } from "./orders.service";
 
-@Controller()
-export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+@Controller("/api/orders")
+export class OrdersController implements OnModuleDestroy {
+    constructor(private readonly ordersService: OrdersService) {}
 
-  @Get()
-  getHello(): string {
-    return this.ordersService.getHello();
-  }
+    @Get()
+    getHello(): string {
+        return this.ordersService.getHello();
+    }
+
+    async onModuleDestroy() {
+        process.exit(1);
+    }
 }
