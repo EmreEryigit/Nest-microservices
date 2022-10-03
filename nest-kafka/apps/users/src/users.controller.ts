@@ -7,6 +7,7 @@ import {
     OnModuleDestroy,
     OnModuleInit,
     Post,
+    Session,
 } from "@nestjs/common";
 import { Client, ClientKafka } from "@nestjs/microservices";
 import { CreateUserDto } from "./dtos/create-user.dto";
@@ -27,13 +28,17 @@ export class UsersController implements OnModuleDestroy {
     }
 
     @Post("/signup")
-    signup(@Body() body: CreateUserDto) {
-        return this.usersService.signup(body);
+    async signup(@Body() body: CreateUserDto, @Session() session: any) {
+        const { user, userJwt } = await this.usersService.signup(body);
+        session.user = userJwt;
+        return user;
     }
 
     @Post("/signin")
-    signin(@Body() body: SigninDto) {
-        return this.usersService.signin(body);
+    async signin(@Body() body: SigninDto, @Session() session: any) {
+        const { user, userJwt } = await this.usersService.signin(body);
+        session.user = userJwt;
+        return user;
     }
 
     async onModuleDestroy() {

@@ -1,4 +1,5 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import { ClientKafka } from "@nestjs/microservices";
 import { InjectRepository } from "@nestjs/typeorm";
 import { randomBytes, scrypt } from "crypto";
@@ -14,7 +15,8 @@ const Ascrypt = promisify(scrypt);
 export class UsersService {
     constructor(
         @InjectRepository(User) private repo: Repository<User>,
-        @Inject("PRODUCTS_SERVICE") private readonly productClient: ClientKafka
+        @Inject("PRODUCTS_SERVICE") private readonly productClient: ClientKafka,
+        private jwt: JwtService
     ) {}
 
     getHello(): string {
@@ -38,7 +40,13 @@ export class UsersService {
         console.log(user);
         await this.repo.save(user);
         this.productClient.emit("user_created", user.email);
-        return user;
+
+        const userJwt = this.jwt.sign({
+            id: user.id,
+            email: user.email,
+        });
+
+        return { user, userJwt };
     }
 
     async signin(dto: SigninDto) {
@@ -56,6 +64,11 @@ export class UsersService {
             throw new BadRequestException("Invalid email or password");
         }
 
-        return foundUser;
+        const userJwt = this.jwt.sign({
+            id: foundUser.id,
+            email: foundUser.email,
+        });
+
+        return { user: foundUser, userJwt };
     }
 }

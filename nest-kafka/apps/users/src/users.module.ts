@@ -1,11 +1,13 @@
 import { microserviceConfig } from "@app/common/microserviceConfig";
-import { Module, ValidationPipe } from "@nestjs/common";
+import { MiddlewareConsumer, Module, ValidationPipe } from "@nestjs/common";
 import { APP_PIPE } from "@nestjs/core";
+import { JwtModule } from "@nestjs/jwt";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
+const cookieSession = require("cookie-session");
 
 @Module({
     imports: [
@@ -26,6 +28,9 @@ import { UsersService } from "./users.service";
                 ...microserviceConfig("products"),
             },
         ]),
+        JwtModule.register({
+            secret: "secret",
+        }),
     ],
     controllers: [UsersController],
     providers: [
@@ -38,4 +43,14 @@ import { UsersService } from "./users.service";
         },
     ],
 })
-export class UsersModule {}
+export class UsersModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(
+                cookieSession({
+                    keys: ["secret"],
+                })
+            )
+            .forRoutes("*");
+    }
+}
