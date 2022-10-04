@@ -44,6 +44,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
+    },
+    "expiration": {
+      "type": "application",
+      "root": "apps/expiration",
+      "entryFile": "main",
+      "sourceRoot": "apps/expiration/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/expiration/tsconfig.app.json"
+      }
+    },
+    "payments": {
+      "type": "application",
+      "root": "apps/payments",
+      "entryFile": "main",
+      "sourceRoot": "apps/payments/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/payments/tsconfig.app.json"
+      }
     }
   }
 }

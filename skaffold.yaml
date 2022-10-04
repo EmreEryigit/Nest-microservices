@@ -38,3 +38,23 @@ build:
             dest: .
           - src: "libs/common/src/**/*.ts"
             dest: .
+    - image: emreeryigit/expiration
+      context: nest-kafka
+      docker:
+        dockerfile: apps/expiration/Dockerfile
+      sync:
+        manual:
+          - src: "apps/expiration/src/**/*.ts"
+            dest: .
+          - src: "libs/common/src/**/*.ts"
+            dest: .
+    - image: emreeryigit/payments
+      context: nest-kafka
+      docker:
+        dockerfile: apps/payments/Dockerfile
+      sync:
+        manual:
+          - src: "apps/payments/src/**/*.ts"
+            dest: .
+          - src: "libs/common/src/**/*.ts"
+            dest: .
