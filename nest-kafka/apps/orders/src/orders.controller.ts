@@ -48,7 +48,8 @@ export class OrdersController implements OnModuleDestroy, OnModuleInit {
         process.on("SIGINT", () => this.productClient.close());
         process.on("SIGTERM", () => this.productClient.close());
     }
-    onModuleDestroy() {
-        process.exit(1);
+    async onModuleDestroy() {
+        await this.productClient.close();
+        process.exit(0);
     }
 }

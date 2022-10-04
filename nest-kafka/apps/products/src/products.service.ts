@@ -76,7 +76,6 @@ export class ProductsService {
     async handleOrderCreated(payload: OrderCreatedPayload) {
         const product = await this.findWithOwner(payload.productId);
         const isOwner = product.owner?.id === payload.userId;
-        console.log("PRODUCTS SERVICE ");
         /*  if (isOwner) {
             throw new BadRequestException();
         } */

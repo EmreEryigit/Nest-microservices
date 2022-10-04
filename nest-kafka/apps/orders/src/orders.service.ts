@@ -37,11 +37,9 @@ export class OrdersService {
             this.productClient
                 .send("order_created", { productId, userId })
                 .subscribe(async (prod) => {
-                    console.log(prod);
                     const product = await this.productsService.create(
                         JSON.parse(prod[0])
                     );
-                    console.log(product);
                     if (!product) {
                         throw new BadGatewayException("KAFKA consumer");
                     }
@@ -59,7 +57,6 @@ export class OrdersService {
                         orderId: order.id,
                         productId,
                     });
-                    console.log(order);
                     return order;
                 });
         };

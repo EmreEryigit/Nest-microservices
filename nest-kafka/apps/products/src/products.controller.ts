@@ -80,7 +80,6 @@ export class ProductsController implements OnModuleDestroy {
 
     @MessagePattern("order_created")
     handleOrderCreated(@Payload() payload: OrderCreatedPayload) {
-        console.log("PRODUCT CONTROLLER");
         return this.productsService.handleOrderCreated(payload);
     }
 
@@ -94,7 +93,6 @@ export class ProductsController implements OnModuleDestroy {
 
     @EventPattern("order_cancelled")
     cancelOrder(@Payload() productId: string) {
-        console.log(productId);
         return this.productsService.cancelOrder(parseInt(productId));
     }
 
