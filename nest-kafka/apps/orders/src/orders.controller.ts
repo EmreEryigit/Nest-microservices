@@ -4,11 +4,13 @@ import { AuthGuard } from "@app/common/guards/auth.guard";
 import { UserPayload } from "@app/common/middlewares/current-user.middleware";
 import {
     Controller,
+    Delete,
     Get,
     Inject,
     OnModuleDestroy,
     OnModuleInit,
     Param,
+    Patch,
     Post,
     UseGuards,
 } from "@nestjs/common";
@@ -23,25 +25,30 @@ export class OrdersController implements OnModuleDestroy, OnModuleInit {
     ) {}
 
     @UseGuards(AuthGuard)
-    @Get()
-    getHello(@CurrentUser() user: UserPayload): string {
-        console.log(user);
-        return this.ordersService.getHello();
-    }
-    @UseGuards(AuthGuard)
     @Post("/:productId")
-    createOrder(@Param("id") id: string, @CurrentUser() user: UserPayload) {
-        return this.ordersService.createOrder(parseInt(id), user.id);
+    createOrder(
+        @Param("productId") productId: string,
+        @CurrentUser() user: UserPayload
+    ) {
+        return this.ordersService.createOrder(parseInt(productId), user.id);
+    }
+
+    @UseGuards(AuthGuard)
+    @Patch("/:orderId")
+    cancelOrder(
+        @Param("orderId") orderId: string,
+        @CurrentUser() user: UserPayload
+    ) {
+        return this.ordersService.cancelOrder(parseInt(orderId), user.id);
     }
 
     async onModuleInit() {
         this.productClient.subscribeToResponseOf("order_created");
         await this.productClient.connect();
-        /* process.on("SIGINT", () => this.productClient.close());
-        process.on("SIGTERM", () => this.productClient.close()); */
+        process.on("SIGINT", () => this.productClient.close());
+        process.on("SIGTERM", () => this.productClient.close());
     }
     onModuleDestroy() {
-        this.productClient.close();
         process.exit(1);
     }
 }

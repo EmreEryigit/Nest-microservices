@@ -42,4 +42,6 @@ export class Product {
 
     @Column({ nullable: true })
     orderId: number;
+
+    
 }

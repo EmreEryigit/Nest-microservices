@@ -9,6 +9,7 @@ import { Order } from "./entities/order.entity";
 import { Product } from "./entities/product.entity";
 import { OrdersController } from "./orders.controller";
 import { OrdersService } from "./orders.service";
+import { ProductsService } from "./products.service";
 const cookieSession = require("cookie-session");
 
 @Module({
@@ -23,7 +24,7 @@ const cookieSession = require("cookie-session");
             entities: [Order, Product],
             synchronize: true,
         }),
-        TypeOrmModule.forFeature([Order]),
+        TypeOrmModule.forFeature([Order, Product]),
         ClientsModule.register([
             {
                 name: "PRODUCTS_SERVICE",
@@ -37,6 +38,7 @@ const cookieSession = require("cookie-session");
     controllers: [OrdersController],
     providers: [
         OrdersService,
+        ProductsService,
         {
             provide: APP_PIPE,
             useValue: new ValidationPipe({

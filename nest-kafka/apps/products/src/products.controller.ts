@@ -43,11 +43,11 @@ export class ProductsController implements OnModuleDestroy {
 
     @UseGuards(AuthGuard)
     @Post()
-    createProduct(
+    async createProduct(
         @Body() createProductDto: CreateProductDto,
         @CurrentUser() user: UserPayload
     ) {
-        this.usersService.createUser(user);
+        await this.usersService.createUser(user);
         return this.productsService.createProduct(createProductDto, user.id);
     }
 
@@ -73,15 +73,29 @@ export class ProductsController implements OnModuleDestroy {
 
     // KAFKA
 
-    @EventPattern("order_created")
-    completeCreated(payload: OrderCreatedPayload) {
-        console.log(payload);
-    }
+    /*    @EventPattern("order_created")
+    completeCreated(@Payload() payload: OrderCreatedPayload) {
+        return console.log(payload);
+    } */
 
     @MessagePattern("order_created")
     handleOrderCreated(@Payload() payload: OrderCreatedPayload) {
-        console.log("PRODUCTS CONTROLLER");
+        console.log("PRODUCT CONTROLLER");
         return this.productsService.handleOrderCreated(payload);
+    }
+
+    @EventPattern("order_creation_completed")
+    completeOrder(@Payload() data: { orderId: string; productId: string }) {
+        return this.productsService.handleOrderCreationCompleted(
+            parseInt(data.orderId),
+            parseInt(data.productId)
+        );
+    }
+
+    @EventPattern("order_cancelled")
+    cancelOrder(@Payload() productId: string) {
+        console.log(productId);
+        return this.productsService.cancelOrder(parseInt(productId));
     }
 
     async onModuleDestroy() {

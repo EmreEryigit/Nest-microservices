@@ -21,6 +21,9 @@ export class ProductDto {
     rating: number;
 
     @Expose()
+    orderId: number;
+
+    @Expose()
     createdAt: Date;
 
     @Expose()
@@ -34,4 +37,6 @@ export class ProductDto {
     })
     @Expose()
     owner?: User;
+
+   
 }

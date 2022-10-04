@@ -1,17 +1,20 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
-
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Order } from "./order.entity";
 
 @Entity()
 export class Product {
     @PrimaryColumn()
-    id: number
+    id: number;
 
     @Column()
-    brand: string
+    brand: string;
 
     @Column()
-    model: string
+    model: string;
 
     @Column()
-    price: number
+    price: number;
+
+    @OneToMany(() => Order, (orders) => orders.product)
+    orders: Order[];
 }

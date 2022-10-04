@@ -3,9 +3,11 @@ import { UserPayload } from "@app/common/middlewares/current-user.middleware";
 import {
     BadRequestException,
     Injectable,
+    NotFoundException,
     UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Observable } from "rxjs";
 import { Repository } from "typeorm";
 import { CreateProductDto } from "./dtos/create-product.dto";
 import { Product } from "./entities/product.entity";
@@ -20,10 +22,6 @@ export class ProductsService {
     getHello(): string {
         return "Hello World!";
     }
-
-    handleUserCreated(data: string) {
-        console.log(data);
-    }
     async findWithOwner(id: number) {
         return await this.repo.findOne({
             where: { id },
@@ -36,7 +34,7 @@ export class ProductsService {
     async createProduct(product: CreateProductDto, userId: number) {
         const newProduct = await this.repo.create(product);
         const foundUser = await this.usersService.findUser(userId);
-        const isDuplicate = foundUser.products.find(
+        const isDuplicate = foundUser?.products?.find(
             (product) =>
                 product.brand.toLowerCase() ===
                     newProduct.brand.toLowerCase() &&
@@ -76,22 +74,47 @@ export class ProductsService {
     }
 
     async handleOrderCreated(payload: OrderCreatedPayload) {
-        console.log("PRODUCTS SERVICE");
         const product = await this.findWithOwner(payload.productId);
-        const isOwner = product.owner.id === payload.userId;
-        if (isOwner) {
+        const isOwner = product.owner?.id === payload.userId;
+        console.log("PRODUCTS SERVICE ");
+        /*  if (isOwner) {
             throw new BadRequestException();
-        }
-        if (product.orderId) {
+        } */
+        /* if (product.orderId) {
             throw new BadRequestException("Not available");
+        } */
+        const prod = {
+            brand: product.brand,
+            model: product.model,
+            price: product.price,
+            id: product.id,
+        };
+
+        return Promise.all([JSON.stringify(prod)]);
+    }
+
+    async handleOrderCreationCompleted(orderId: number, productId: number) {
+        const product = await this.repo.findOneBy({
+            id: productId,
+        });
+        if (!product) {
+            throw new BadRequestException("Product can not be found!");
+        }
+        product.orderId = orderId;
+        await this.repo.save(product);
+        return product;
+    }
+
+    async cancelOrder(productId: number) {
+        const product = await this.repo.findOneBy({
+            id: productId,
+        });
+        if (!product) {
+            throw new NotFoundException("Product does not exist");
         }
 
-        return {
-            product: {
-                brand: product.brand,
-                model: product.model,
-                price: product.price,
-            },
-        };
+        product.orderId = null;
+        await this.repo.save(product);
+        return product;
     }
 }
