@@ -32,12 +32,10 @@ export class UsersService {
         const salt = randomBytes(8).toString("hex");
         const hash = (await Ascrypt(password, salt, 32)) as Buffer;
         const result = salt + "." + hash.toString("hex");
-        console.log(result);
         const user = this.repo.create({
             email,
             password: result,
         });
-        console.log(user);
         await this.repo.save(user);
         this.productClient.emit("user_created", user.email);
 
@@ -45,7 +43,6 @@ export class UsersService {
             id: user.id,
             email: user.email,
         });
-
         return { user, userJwt };
     }
 

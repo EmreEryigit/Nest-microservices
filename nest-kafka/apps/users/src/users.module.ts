@@ -1,8 +1,9 @@
 import { microserviceConfig } from "@app/common/microserviceConfig";
+import { CurrentUserMiddleware } from "@app/common/middlewares/current-user.middleware";
 import { MiddlewareConsumer, Module, ValidationPipe } from "@nestjs/common";
 import { APP_PIPE } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
-import { ClientsModule, Transport } from "@nestjs/microservices";
+import { ClientsModule } from "@nestjs/microservices";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { UsersController } from "./users.controller";
@@ -29,7 +30,7 @@ const cookieSession = require("cookie-session");
             },
         ]),
         JwtModule.register({
-            secret: "secret",
+            secret: process.env.JWT_KEY,
         }),
     ],
     controllers: [UsersController],
@@ -52,5 +53,7 @@ export class UsersModule {
                 })
             )
             .forRoutes("*");
+
+        consumer.apply(CurrentUserMiddleware).forRoutes("*");
     }
 }

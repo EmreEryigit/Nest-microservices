@@ -1,23 +1,87 @@
+import { CurrentUser } from "@app/common/decorators/current-user.decorator";
+import { OrderCreatedPayload } from "@app/common/events/order-created.event";
+import { AuthGuard } from "@app/common/guards/auth.guard";
+import { Serialize } from "@app/common/interceptors/serialize.interceptor";
 import { microserviceConfig } from "@app/common/microserviceConfig";
-import { Controller, Get, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
-import { Client, ClientKafka, EventPattern } from "@nestjs/microservices";
+import { UserPayload } from "@app/common/middlewares/current-user.middleware";
+import {
+    Body,
+    Controller,
+    Get,
+    OnModuleDestroy,
+    OnModuleInit,
+    Param,
+    Patch,
+    Post,
+    UseGuards,
+} from "@nestjs/common";
+import {
+    Client,
+    ClientKafka,
+    EventPattern,
+    MessagePattern,
+    Payload,
+} from "@nestjs/microservices";
+import { CreateProductDto } from "./dtos/create-product.dto";
+import { ProductDto } from "./dtos/product.dto";
 import { ProductsService } from "./products.service";
+import { UsersService } from "./users/users.service";
 
+@Serialize(ProductDto)
 @Controller("/api/products")
 export class ProductsController implements OnModuleDestroy {
-    constructor(private readonly productsService: ProductsService) {}
+    constructor(
+        private readonly productsService: ProductsService,
+        private readonly usersService: UsersService
+    ) {}
 
-    @Client(microserviceConfig("products"))
-    client: ClientKafka;
-
-    @Get()
-    getHello(): string {
-        return this.productsService.getHello();
+    @UseGuards(AuthGuard)
+    @Get("/whoami")
+    whoAmI(@CurrentUser() user: UserPayload) {
+        return user;
     }
 
-    @EventPattern("user_created")
-    handleUserCreated(data: string) {
-        this.productsService.handleUserCreated(data);
+    @UseGuards(AuthGuard)
+    @Post()
+    createProduct(
+        @Body() createProductDto: CreateProductDto,
+        @CurrentUser() user: UserPayload
+    ) {
+        this.usersService.createUser(user);
+        return this.productsService.createProduct(createProductDto, user.id);
+    }
+
+    @UseGuards(AuthGuard)
+    @Patch("/:id")
+    updateProduct(
+        @Param("id") id: string,
+        @Body() body: Partial<CreateProductDto>,
+        @CurrentUser() user: UserPayload
+    ) {
+        return this.productsService.updateProduct(parseInt(id), body, user);
+    }
+
+    @Get("/:id")
+    getProduct(@Param("id") id: string) {
+        return this.productsService.findProduct(parseInt(id));
+    }
+
+    @Get()
+    getAllProducts() {
+        return this.productsService.findAllProducts();
+    }
+
+    // KAFKA
+
+    @EventPattern("order_created")
+    completeCreated(payload: OrderCreatedPayload) {
+        console.log(payload);
+    }
+
+    @MessagePattern("order_created")
+    handleOrderCreated(@Payload() payload: OrderCreatedPayload) {
+        console.log("PRODUCTS CONTROLLER");
+        return this.productsService.handleOrderCreated(payload);
     }
 
     async onModuleDestroy() {
