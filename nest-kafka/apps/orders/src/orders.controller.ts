@@ -1,11 +1,8 @@
 import { CurrentUser } from "@app/common/decorators/current-user.decorator";
-import { Patterns } from "@app/common/events/event-patterns";
 import { AuthGuard } from "@app/common/guards/auth.guard";
 import { UserPayload } from "@app/common/middlewares/current-user.middleware";
 import {
     Controller,
-    Delete,
-    Get,
     Inject,
     OnModuleDestroy,
     OnModuleInit,

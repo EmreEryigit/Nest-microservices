@@ -11,7 +11,6 @@ import { ClientKafka } from "@nestjs/microservices";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Order } from "./entities/order.entity";
-import { Product } from "./entities/product.entity";
 import { ProductsService } from "./products.service";
 
 const EXPIRATION_WINDOW_SECONDS = 60 * 0.5;
@@ -43,7 +42,6 @@ export class OrdersService {
                 .subscribe(async (prod) => {
                     try {
                         if (!prod[0]) {
-                            console.log("first check");
                             throw new BadRequestException();
                         }
                         const product = await this.productsService.create(
@@ -77,14 +75,12 @@ export class OrdersService {
                                 userId: order.userId,
                             }
                         );
-                        console.log("!!!");
                         this.expirationClient.emit(
                             "order_creation_completed_expiration",
                             { orderId: order.id, expiresAt: order.expiresAt }
                         );
                         return order;
                     } catch (err) {
-                        console.error(err);
                         return err.response;
                     }
                 });
@@ -94,7 +90,6 @@ export class OrdersService {
     }
     async cancelOrder(orderId: number, userId: number) {
         const order = await this.findWithProduct(orderId);
-        console.log(order);
 
         if (!order) {
             throw new NotFoundException("Order does not exist");
@@ -128,9 +123,7 @@ export class OrdersService {
         return order;
     }
     async orderExpired(orderId: number) {
-        const order = await this.repo.findOneBy({
-            id: orderId,
-        });
+        const order = await this.findWithProduct(orderId);
         if (!order) {
             throw new BadRequestException();
         }
@@ -141,7 +134,7 @@ export class OrdersService {
 
         order.status = OrderStatus.Cancelled;
         await this.repo.save(order);
-
+        this.productClient.emit("order_cancelled", order.product.id);
         return order;
     }
 }

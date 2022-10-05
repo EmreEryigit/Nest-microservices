@@ -7,7 +7,6 @@ import {
     UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Observable } from "rxjs";
 import { Repository } from "typeorm";
 import { CreateProductDto } from "./dtos/create-product.dto";
 import { Product } from "./entities/product.entity";
@@ -93,11 +92,9 @@ export class ProductsService {
     }
 
     async handleOrderCreationCompleted(orderId: number, productId: number) {
-        console.log(orderId, productId);
         const product = await this.repo.findOneBy({
             id: productId,
         });
-        console.log(product);
         if (!product) {
             throw new BadRequestException("Product can not be found!");
         }

@@ -1,6 +1,5 @@
 import { microserviceConfig } from "@app/common/microserviceConfig";
 import { NestFactory } from "@nestjs/core";
-import { Transport } from "@nestjs/microservices";
 import { UsersModule } from "./users.module";
 
 async function bootstrap() {
