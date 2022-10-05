@@ -76,12 +76,12 @@ export class ProductsService {
     async handleOrderCreated(payload: OrderCreatedPayload) {
         const product = await this.findWithOwner(payload.productId);
         const isOwner = product.owner?.id === payload.userId;
-        /*  if (isOwner) {
-            throw new BadRequestException();
-        } */
-        /* if (product.orderId) {
-            throw new BadRequestException("Not available");
-        } */
+        if (isOwner) {
+            return Promise.all([false]);
+        }
+        if (product.orderId) {
+            return Promise.all([false]);
+        }
         const prod = {
             brand: product.brand,
             model: product.model,
@@ -93,9 +93,11 @@ export class ProductsService {
     }
 
     async handleOrderCreationCompleted(orderId: number, productId: number) {
+        console.log(orderId, productId);
         const product = await this.repo.findOneBy({
             id: productId,
         });
+        console.log(product);
         if (!product) {
             throw new BadRequestException("Product can not be found!");
         }

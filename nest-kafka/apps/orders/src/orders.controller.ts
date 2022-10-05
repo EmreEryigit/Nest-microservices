@@ -14,7 +14,7 @@ import {
     Post,
     UseGuards,
 } from "@nestjs/common";
-import { ClientKafka } from "@nestjs/microservices";
+import { ClientKafka, EventPattern, Payload } from "@nestjs/microservices";
 import { OrdersService } from "./orders.service";
 
 @Controller("/api/orders")
@@ -40,6 +40,16 @@ export class OrdersController implements OnModuleDestroy, OnModuleInit {
         @CurrentUser() user: UserPayload
     ) {
         return this.ordersService.cancelOrder(parseInt(orderId), user.id);
+    }
+
+    @EventPattern("payment_created")
+    handlePaymentCreated(@Payload() orderId: string) {
+        return this.ordersService.paymentComplete(parseInt(orderId));
+    }
+
+    @EventPattern("expiration_completed")
+    expirationCompleted(orderId: string) {
+        return this.ordersService.orderExpired(parseInt(orderId));
     }
 
     async onModuleInit() {

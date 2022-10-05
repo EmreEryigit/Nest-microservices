@@ -28,7 +28,15 @@ const cookieSession = require("cookie-session");
         ClientsModule.register([
             {
                 name: "PRODUCTS_SERVICE",
-                ...microserviceConfig("orders"),
+                ...microserviceConfig("products"),
+            },
+            {
+                name: "PAYMENTS_SERVICE",
+                ...microserviceConfig("payments"),
+            },
+            {
+                name: "EXPIRATION_SERVICE",
+                ...microserviceConfig("expiration"),
             },
         ]),
         JwtModule.register({

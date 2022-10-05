@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orders-depl
+  name: expiration-depl
 spec:
   selector:
     matchLabels:
-      app: orders
+      app: expiration
   template:
     metadata:
       labels:
-        app: orders
+        app: expiration
     spec:
       containers:
-        - name: orders
-          image: emreeryigit/orders
+        - name: expiration
+          image: emreeryigit/expiration
           env:
             - name: REDIS_HOST
               value: expiration-redis-srv

@@ -73,18 +73,14 @@ export class ProductsController implements OnModuleDestroy {
 
     // KAFKA
 
-    /*    @EventPattern("order_created")
-    completeCreated(@Payload() payload: OrderCreatedPayload) {
-        return console.log(payload);
-    } */
-
     @MessagePattern("order_created")
     handleOrderCreated(@Payload() payload: OrderCreatedPayload) {
         return this.productsService.handleOrderCreated(payload);
     }
 
-    @EventPattern("order_creation_completed")
+    @EventPattern("order_creation_completed_products")
     completeOrder(@Payload() data: { orderId: string; productId: string }) {
+        console.log(data);
         return this.productsService.handleOrderCreationCompleted(
             parseInt(data.orderId),
             parseInt(data.productId)

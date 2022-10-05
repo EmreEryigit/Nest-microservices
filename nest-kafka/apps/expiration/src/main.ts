@@ -1,8 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { ExpirationModule } from './expiration.module';
+import { microserviceConfig } from "@app/common/microserviceConfig";
+import { NestFactory } from "@nestjs/core";
+import { MicroserviceOptions } from "@nestjs/microservices";
+import { ExpirationModule } from "./expiration.module";
 
 async function bootstrap() {
-  const app = await NestFactory.create(ExpirationModule);
-  await app.listen(3000);
+    const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+        ExpirationModule,
+        microserviceConfig("expiration")
+    );
+
+    app.listen();
 }
 bootstrap();

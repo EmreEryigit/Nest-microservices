@@ -1,3 +1,4 @@
+import { OrderStatus } from "@app/common/types/OrderStatus";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -16,5 +17,16 @@ export class ProductsService {
         return product;
     }
 
-  
+    /* async findProductOrders(productId: number) {
+        const product = await this.repo.findOne({
+            where: {
+                id: productId,
+            },
+            relations: {
+                orders: true,
+            },
+        });
+        const isOrder = product.orders?.map(order => order.status ===  OrderStatus.)
+
+    } */
 }
